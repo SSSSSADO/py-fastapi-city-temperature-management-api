@@ -1,12 +1,8 @@
 import httpx
 
 
-async def fetch_temperature(city_name: str) -> float:
+def fetch_temperature(city_name: str):
     url = f"https://wttr.in/{city_name}?format=j1"
-
-    async with httpx.AsyncClient() as client:
-        response = await client.get(url)
-
+    response = httpx.get(url)
     data = response.json()
-    temperature = float(data["current_condition"][0]["temp_C"])
-    return temperature
+    return float(data["current_condition"][0]["temp_C"])

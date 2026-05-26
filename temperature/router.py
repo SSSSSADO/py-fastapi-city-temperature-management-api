@@ -18,18 +18,19 @@ def get_temperatures(
 
 
 @router.post("/temperatures/update")
-async def update_temperatures(db: Session = Depends(get_db)):
+def update_temperatures(db: Session = Depends(get_db)):
     cities = db.query(city_models.City).all()
-    result = []
+    results = []
 
     for city in cities:
-        current_temperature = (await services.fetch_temperature(city.name))
-        temperature = schemas.TemperatureCreate(
-            city_id=city.id, temperature=current_temperature
+        temp = services.fetch_temperature(city.name)
+        obj = crud.create_temperature(
+            db=db,
+            temperature=schemas.TemperatureCreate(
+                city_id=city.id,
+                temperature=temp
+            )
         )
-        created_temperature = (
-            crud.create_temperature(db=db, temperature=temperature)
-        )
-        result.append(created_temperature)
+        results.append(obj)
 
-    return result
+    return results
